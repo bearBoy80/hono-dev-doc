@@ -1,14 +1,9 @@
----
-title: Body Limit 中间件
-description: hono 内置的 Body Size Limit 中间件。
----
+# 正文限制中间件
 
-# Body Limit 中间件
+正文限制中间件可以限制请求正文的文件大小。
 
-Body Limit 中间件用于限制请求体的文件大小。
-
-该中间件首先会检查请求中的 `Content-Length` 头部值（如果存在）。
-如果该头部未设置，中间件会以流的方式读取请求体，当大小超过指定限制时触发错误处理程序。
+此中间件首先使用请求中 `Content-Length` 标头的值（如果存在）。
+如果未设置，它将以流的形式读取正文，如果大于指定的文件大小，则执行错误处理程序。
 
 ## 导入
 
@@ -17,7 +12,7 @@ import { Hono } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 ```
 
-## 使用方法
+## 用法
 
 ```ts
 const app = new Hono()
@@ -27,50 +22,50 @@ app.post(
   bodyLimit({
     maxSize: 50 * 1024, // 50kb
     onError: (c) => {
-      return c.text('超出限制 :(', 413)
+      return c.text('溢出 :(', 413)
     },
   }),
   async (c) => {
     const body = await c.req.parseBody()
     if (body['file'] instanceof File) {
-      console.log(`收到文件大小：${body['file'].size}`)
+      console.log(`获取到文件大小：${body['file'].size}`)
     }
     return c.text('通过 :)')
   }
 )
 ```
 
-## 配置选项
+## 选项
 
-### <Badge type="danger" text="必填" /> maxSize: `number`
+### <Badge type="danger" text="必需" /> maxSize: `number`
 
-要限制的文件最大大小。默认值为 `100 * 1024` - `100kb`。
+您要限制的文件的最大文件大小。默认值为 `100 * 1024` - `100kb`。
 
 ### <Badge type="info" text="可选" /> onError: `OnError`
 
-当超过指定文件大小时要调用的错误处理函数。
+如果超过指定的文件大小，将调用的错误处理程序。
 
-## 在 Bun 中处理大型请求
+## 在 Bun 中用于大请求的用法
 
-如果 Body Limit 中间件被显式配置为允许超过默认大小的请求体，可能需要相应地调整 `Bun.serve` 的配置。[在撰写本文时](https://github.com/oven-sh/bun/blob/f2cfa15e4ef9d730fc6842ad8b79fb7ab4c71cb9/packages/bun-types/bun.d.ts#L2191)，`Bun.serve` 的默认请求体大小限制为 128MiB。如果你将 Hono 的 Body Limit 中间件设置为大于该值，请求仍会失败，而且中间件中指定的 `onError` 处理程序也不会被调用。这是因为 `Bun.serve()` 会在请求传递给 Hono 之前将状态码设置为 `413` 并终止连接。
+如果显式使用正文限制中间件以允许大于默认值的请求正文，则可能需要相应地更改 `Bun.serve` 配置。[在撰写本文时](https://github.com/oven-sh/bun/blob/f2cfa15e4ef9d730fc6842ad8b79fb7ab4c71cb9/packages/bun-types/bun.d.ts#L2191)，`Bun.serve` 的默认请求正文限制为 128MiB。如果将 Hono 的正文限制中间件设置为大于该值，您的请求仍将失败，此外，中间件中指定的 `onError` 处理程序将不会被调用。这是因为 `Bun.serve()` 会将状态码设置为 `413` 并在将请求传递给 Hono 之前终止连接。
 
-如果你想在 Hono 和 Bun 中接受大于 128MiB 的请求，你需要同时设置 Bun 的限制：
+如果您想使用 Hono 和 Bun 接受大于 128MiB 的请求，则还需要为 Bun 设置限制：
 
 ```ts
 export default {
   port: process.env['PORT'] || 3000,
   fetch: app.fetch,
-  maxRequestBodySize: 1024 * 1024 * 200, // 在此设置你的值
+  maxRequestBodySize: 1024 * 1024 * 200, // 此处为您的值
 }
 ```
 
-或者，根据你的设置：
+或者，根据您的设置：
 
 ```ts
 Bun.serve({
   fetch(req, server) {
     return app.fetch(req, { ip: server.requestIP(req) })
   },
-  maxRequestBodySize: 1024 * 1024 * 200, // 在此设置你的值
+  maxRequestBodySize: 1024 * 1024 * 200, // 此处为您的值
 })
 ```

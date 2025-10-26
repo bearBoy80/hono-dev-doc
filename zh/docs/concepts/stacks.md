@@ -1,27 +1,23 @@
----
-title: 技术栈
-description: Hono 提供了完整的技术栈支持，包括 RPC、验证器和类型安全的 HTTP 客户端，让开发者能够轻松构建全栈应用。
----
 # Hono 技术栈
 
-Hono 让简单的事情变得简单，让复杂的事情也变得简单。
-它不仅仅适用于返回 JSON 数据，
-还非常适合构建包含 REST API 服务器和客户端的全栈应用。
+Hono 让简单的事情变得简单，让困难的事情也变得简单。
+它不仅适用于返回 JSON。
+它也非常适合构建包括 REST API 服务器和客户端的全栈应用程序。
 
 ## RPC
 
-Hono 的 RPC 功能允许你在几乎不改变代码的情况下共享 API 规范。
+Hono 的 RPC 功能允许您以少量代码改动即可共享 API 规范。
 由 `hc` 生成的客户端将读取规范并以类型安全的方式访问端点。
 
-以下库使这一切成为可能：
+以下库使其成为可能。
 
 - Hono - API 服务器
 - [Zod](https://zod.dev) - 验证器
-- [Zod Validator Middleware](https://github.com/honojs/middleware/tree/main/packages/zod-validator)
+- [Zod 验证器中间件](https://github.com/honojs/middleware/tree/main/packages/zod-validator)
 - `hc` - HTTP 客户端
 
 我们可以将这些组件的集合称为 **Hono 技术栈**。
-现在让我们用它来创建一个 API 服务器和客户端。
+现在让我们用它来创建一个 API 服务器和一个客户端。
 
 ## 编写 API
 
@@ -34,16 +30,16 @@ const app = new Hono()
 
 app.get('/hello', (c) => {
   return c.json({
-    message: `Hello!`,
+    message: `你好！`,
   })
 })
 ```
 
 ## 使用 Zod 进行验证
 
-使用 Zod 来验证查询参数的值。
+使用 Zod 进行验证以接收查询参数的值。
 
-![SC](/images/sc01.gif)
+![](/images/sc01.gif)
 
 ```ts
 import { zValidator } from '@hono/zod-validator'
@@ -60,7 +56,7 @@ app.get(
   (c) => {
     const { name } = c.req.valid('query')
     return c.json({
-      message: `Hello! ${name}`,
+      message: `你好！ ${name}`,
     })
   }
 )
@@ -68,11 +64,11 @@ app.get(
 
 ## 共享类型
 
-要生成端点规范，需要导出其类型。
+要发出端点规范，请导出其类型。
 
 ::: warning
 
-为了让 RPC 正确推断路由，所有包含的方法必须被链式调用，并且端点或应用类型必须从声明的变量中推断。更多信息，请参见 [RPC 的最佳实践](https://hono.dev/docs/guides/best-practices#if-you-want-to-use-rpc-features)。
+为了让 RPC 正确推断路由，所有包含的方法都必须被链接，并且端点或应用程序类型必须从声明的变量中推断。更多信息，请参阅 [RPC 最佳实践](https://hono.dev/docs/guides/best-practices#if-you-want-to-use-rpc-features)。
 
 :::
 
@@ -88,7 +84,7 @@ const route = app.get(
   (c) => {
     const { name } = c.req.valid('query')
     return c.json({
-      message: `Hello! ${name}`,
+      message: `你好！ ${name}`,
     })
   }
 )
@@ -98,11 +94,11 @@ export type AppType = typeof route
 
 ## 客户端
 
-接下来是客户端实现。
+接下来。客户端实现。
 通过将 `AppType` 类型作为泛型传递给 `hc` 来创建客户端对象。
-然后，神奇地，代码补全会生效，并提示端点路径和请求类型。
+然后，神奇地，补全功能开始工作，并建议端点路径和请求类型。
 
-![SC](/images/sc03.gif)
+![](/images/sc03.gif)
 
 ```ts
 import { AppType } from './server'
@@ -116,24 +112,24 @@ const res = await client.hello.$get({
 })
 ```
 
-`Response` 与 fetch API 兼容，但通过 `json()` 获取的数据是有类型的。
+`Response` 与 fetch API 兼容，但可以使用 `json()` 检索的数据具有类型。
 
-![SC](/images/sc04.gif)
+![](/images/sc04.gif)
 
 ```ts
 const data = await res.json()
 console.log(`${data.message}`)
 ```
 
-共享 API 规范意味着你可以及时发现服务器端的变更。
+共享 API 规范意味着您可以意识到服务器端的更改。
 
-![SS](/images/ss03.png)
+![](/images/ss03.png)
 
-## 与 React 集成
+## 与 React 配合使用
 
-你可以在 Cloudflare Pages 上使用 React 创建应用。
+您可以使用 React 在 Cloudflare Pages 上创建应用程序。
 
-API 服务器：
+API 服务器。
 
 ```ts
 // functions/api/[[route]].ts
@@ -158,7 +154,7 @@ const route = app
     const todo = c.req.valid('form')
     todos.push(todo)
     return c.json({
-      message: 'created!',
+      message: '已创建！',
     })
   })
   .get((c) => {
@@ -172,7 +168,7 @@ export type AppType = typeof route
 export const onRequest = handle(app, '/api')
 ```
 
-使用 React 和 React Query 的客户端：
+使用 React 和 React Query 的客户端。
 
 ```tsx
 // src/App.tsx
@@ -232,7 +228,7 @@ const Todos = () => {
         onClick={() => {
           mutation.mutate({
             id: Date.now().toString(),
-            title: 'Write code',
+            title: '写代码',
           })
         }}
       >

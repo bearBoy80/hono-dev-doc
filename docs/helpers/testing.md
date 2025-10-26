@@ -1,7 +1,3 @@
----
-title: Testing Helper
-description: This helper provides functions to make testing of Hono applications easier.
----
 # Testing Helper
 
 The Testing Helper provides functions to make testing of Hono applications easier.
@@ -41,7 +37,7 @@ export default app
 // index.test.ts
 import { Hono } from 'hono'
 import { testClient } from 'hono/testing'
-import { describe, test, expect } from 'vitest' // Or your preferred test runner
+import { describe, it, expect } from 'vitest' // Or your preferred test runner
 import app from './app'
 
 describe('Search Endpoint', () => {
@@ -55,6 +51,44 @@ describe('Search Endpoint', () => {
     const res = await client.search.$get({
       query: { q: 'hono' },
     })
+
+    // Assertions
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({
+      query: 'hono',
+      results: ['result1', 'result2'],
+    })
+  })
+})
+```
+
+To include headers in your test, pass them as the second parameter in the call. The second parameter can also take an `init` property as a `RequestInit` object, allowing you to set headers, method, body, etc. Learn more about the `init` property [here](/docs/guides/rpc#init-option).
+
+```ts
+// index.test.ts
+import { Hono } from 'hono'
+import { testClient } from 'hono/testing'
+import { describe, it, expect } from 'vitest' // Or your preferred test runner
+import app from './app'
+
+describe('Search Endpoint', () => {
+  // Create the test client from the app instance
+  const client = testClient(app)
+
+  it('should return search results', async () => {
+    // Include the token in the headers and set the content type
+    const token = 'this-is-a-very-clean-token'
+    const res = await client.search.$get(
+      {
+        query: { q: 'hono' },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': `application/json`,
+        },
+      }
+    )
 
     // Assertions
     expect(res.status).toBe(200)

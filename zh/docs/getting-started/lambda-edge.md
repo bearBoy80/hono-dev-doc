@@ -1,16 +1,14 @@
----
-title: Lambda@Edge
-description: 使用 AWS CDK 在 Lambda@Edge 边缘计算平台上开发和部署 Hono 应用程序。
----
 # Lambda@Edge
 
-[Lambda@Edge](https://aws.amazon.com/lambda/edge/) 是亚马逊云服务（AWS）提供的一个无服务器平台。它允许您在 Amazon CloudFront 的边缘节点运行 Lambda 函数，使您能够自定义 HTTP 请求/响应的行为。
+[Lambda@Edge](https://aws.amazon.com/lambda/edge/) 是亚马逊网络服务提供的一个无服务器平台。它允许您在亚马逊 CloudFront 的边缘站点运行 Lambda 函数，从而能够自定义 HTTP 请求/响应的行为。
 
-Hono 支持在 Node.js 18+ 环境下使用 Lambda@Edge。
+Hono 支持 Lambda@Edge 与 Node.js 18+ 环境。
 
-## 1. 环境搭建
+## 1. 设置
 
-在 Lambda@Edge 上创建应用程序时，使用 [CDK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-cdk.html) 可以方便地设置 CloudFront、IAM Role、API Gateway 等功能。
+在 Lambda@Edge 上创建应用程序时，
+[CDK](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-cdk.html)
+对于设置诸如 CloudFront、IAM 角色、API 网关等函数非常有用。
 
 使用 `cdk` CLI 初始化您的项目。
 
@@ -52,7 +50,7 @@ mkdir lambda
 
 ## 2. Hello World
 
-编辑 `lambda/index_edge.ts` 文件。
+编辑 `lambda/index_edge.ts`。
 
 ```ts
 import { Hono } from 'hono'
@@ -60,14 +58,14 @@ import { handle } from 'hono/lambda-edge'
 
 const app = new Hono()
 
-app.get('/', (c) => c.text('Hello Hono on Lambda@Edge!'))
+app.get('/', (c) => c.text('你好 Hono on Lambda@Edge！'))
 
 export const handler = handle(app)
 ```
 
 ## 3. 部署
 
-编辑 `bin/my-app.ts` 文件。
+编辑 `bin/my-app.ts`。
 
 ```ts
 #!/usr/bin/env node
@@ -84,7 +82,7 @@ new MyAppStack(app, 'MyAppStack', {
 })
 ```
 
-编辑 `lambda/cdk-stack.ts` 文件。
+编辑 `lambda/cdk-stack.ts`。
 
 ```ts
 import { Construct } from 'constructs'
@@ -106,7 +104,7 @@ export class MyAppStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_20_X,
     })
 
-    // 上传任意 html 文件
+    // 上传任何 html
     const originBucket = new s3.Bucket(this, 'originBucket')
 
     new cloudfront.Distribution(this, 'Cdn', {
@@ -124,13 +122,13 @@ export class MyAppStack extends cdk.Stack {
 }
 ```
 
-最后，运行以下命令进行部署：
+最后，运行命令进行部署：
 
 ```sh
 cdk deploy
 ```
 
-## 回调函数
+## 回调
 
 如果您想添加基本身份验证并在验证后继续处理请求，可以使用 `c.env.callback()`
 

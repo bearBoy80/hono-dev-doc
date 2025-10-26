@@ -1,7 +1,3 @@
----
-title: Proxy
-description: Using Hono as a proxy.
----
 # Proxy
 
 ::: tip

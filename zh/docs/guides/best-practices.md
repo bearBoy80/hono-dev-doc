@@ -1,50 +1,46 @@
----
-title: 最佳实践
-description: 遵循最佳实践，编写高效、可维护的 Hono应用程序。
----
 # 最佳实践
 
-Hono 非常灵活，你可以按照自己喜欢的方式编写应用。
-但是，有一些最佳实践值得遵循。
+Hono 非常灵活。您可以随心所欲地编写您的应用程序。
+然而，遵循一些最佳实践会更好。
 
-## 尽可能不要创建"控制器"
+## 尽可能不要创建“控制器”
 
-在可能的情况下，你不应该创建"Ruby on Rails 风格的控制器"。
+如果可能，您不应该创建“类似 Ruby on Rails 的控制器”。
 
 ```ts
 // 🙁
-// Rails 风格的控制器
+// 一个类似 RoR 的控制器
 const booksList = (c: Context) => {
-  return c.json('list books')
+  return c.json('图书列表')
 }
 
 app.get('/books', booksList)
 ```
 
-这个问题与类型有关。例如，在不编写复杂泛型的情况下，无法在控制器中推断路径参数。
+问题与类型有关。例如，在不编写复杂泛型的情况下，无法在控制器中推断路径参数。
 
 ```ts
 // 🙁
-// Rails 风格的控制器
+// 一个类似 RoR 的控制器
 const bookPermalink = (c: Context) => {
   const id = c.req.param('id') // 无法推断路径参数
-  return c.json(`get ${id}`)
+  return c.json(`获取 ${id}`)
 }
 ```
 
-因此，你不需要创建 Rails 风格的控制器，应该直接在路径定义后编写处理程序。
+因此，您不需要创建类似 RoR 的控制器，而应直接在路径定义后编写处理程序。
 
 ```ts
 // 😃
 app.get('/books/:id', (c) => {
   const id = c.req.param('id') // 可以推断路径参数
-  return c.json(`get ${id}`)
+  return c.json(`获取 ${id}`)
 })
 ```
 
-## 使用 `hono/factory` 中的 `factory.createHandlers()`
+## `hono/factory` 中的 `factory.createHandlers()`
 
-如果你仍然想创建 Rails 风格的控制器，可以使用 [`hono/factory`](/docs/helpers/factory) 中的 `factory.createHandlers()`。使用这个方法，类型推断将正常工作。
+如果您仍然想创建一个类似 RoR 的控制器，请使用 [`hono/factory`](/docs/helpers/factory) 中的 `factory.createHandlers()`。如果使用此方法，类型推断将正常工作。
 
 ```ts
 import { createFactory } from 'hono/factory'
@@ -67,11 +63,11 @@ const handlers = factory.createHandlers(logger(), middleware, (c) => {
 app.get('/api', ...handlers)
 ```
 
-## 构建大型应用
+## 构建更大的应用程序
 
-使用 `app.route()` 来构建大型应用，而不是创建"Ruby on Rails 风格的控制器"。
+使用 `app.route()` 构建更大的应用程序，而无需创建“类似 Ruby on Rails 的控制器”。
 
-如果你的应用有 `/authors` 和 `/books` 端点，并且你希望将文件从 `index.ts` 分离出来，可以创建 `authors.ts` 和 `books.ts`。
+如果您的应用程序有 `/authors` 和 `/books` 端点，并且您希望将文件与 `index.ts` 分开，请创建 `authors.ts` 和 `books.ts`。
 
 ```ts
 // authors.ts
@@ -79,9 +75,9 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
-app.get('/', (c) => c.json('list authors'))
-app.post('/', (c) => c.json('create an author', 201))
-app.get('/:id', (c) => c.json(`get ${c.req.param('id')}`))
+app.get('/', (c) => c.json('作者列表'))
+app.post('/', (c) => c.json('创建作者', 201))
+app.get('/:id', (c) => c.json(`获取 ${c.req.param('id')}`))
 
 export default app
 ```
@@ -92,14 +88,14 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
-app.get('/', (c) => c.json('list books'))
-app.post('/', (c) => c.json('create a book', 201))
-app.get('/:id', (c) => c.json(`get ${c.req.param('id')}`))
+app.get('/', (c) => c.json('图书列表'))
+app.post('/', (c) => c.json('创建图书', 201))
+app.get('/:id', (c) => c.json(`获取 ${c.req.param('id')}`))
 
 export default app
 ```
 
-然后，导入它们并使用 `app.route()` 将它们挂载到 `/authors` 和 `/books` 路径上。
+然后，导入它们并使用 `app.route()` 将它们挂载到路径 `/authors` 和 `/books` 上。
 
 ```ts
 // index.ts
@@ -116,31 +112,32 @@ app.route('/books', books)
 export default app
 ```
 
-### 如果你想使用 RPC 功能
+### 如果您想使用 RPC 功能
 
-上述代码对于普通用例来说运行良好。
-但是，如果你想使用 `RPC` 功能，你可以通过以下方式链式调用来获得正确的类型。
+上面的代码在正常用例中运行良好。
+但是，如果您想使用 `RPC` 功能，可以通过如下链接获得正确的类型。
 
 ```ts
 // authors.ts
 import { Hono } from 'hono'
 
 const app = new Hono()
-  .get('/', (c) => c.json('list authors'))
-  .post('/', (c) => c.json('create an author', 201))
-  .get('/:id', (c) => c.json(`get ${c.req.param('id')}`))
+  .get('/', (c) => c.json('作者列表'))
+  .post('/', (c) => c.json('创建作者', 201))
+  .get('/:id', (c) => c.json(`获取 ${c.req.param('id')}`))
 
 export default app
+export type AppType = typeof app
 ```
 
-如果你将 `app` 的类型传递给 `hc`，它将获得正确的类型。
+如果将 `app` 的类型传递给 `hc`，它将获得正确的类型。
 
 ```ts
-import app from './authors'
+import type { AppType } from './authors'
 import { hc } from 'hono/client'
 
 // 😃
-const client = hc<typeof app>('http://localhost') // 类型正确
+const client = hc<AppType>('http://localhost') // 类型正确
 ```
 
-更详细的信息，请参阅 [RPC 页面](/docs/guides/rpc#using-rpc-with-larger-applications)。
+有关更详细的信息，请参阅 [RPC 页面](/docs/guides/rpc#using-rpc-with-larger-applications)。

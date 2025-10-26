@@ -1,21 +1,14 @@
----
-title: Vercel
-description: 使用 Vercel 边缘函数在 Vercel 中运行 Hono，包括环境搭建、适配器配置和示例代码的概述。
----
 # Vercel
 
-Vercel 是一个为前端开发者打造的平台，为创新者提供灵感迸发时所需的速度和可靠性。本节介绍在 Vercel 上运行的 Next.js。
+Vercel 是 AI 云，提供开发人员工具和云基础设施来构建、扩展和保护更快、更个性化的 Web。
 
-Next.js 是一个灵活的 React 框架，为创建快速 Web 应用程序提供了构建模块。
+Hono 可以零配置部署到 Vercel。
 
-在 Next.js 中，[Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions)（边缘函数）允许你在 Vercel 等边缘运行时上创建动态 API。
-使用 Hono，你可以使用与其他运行时相同的语法编写 API，并使用许多中间件。
+## 1. 设置
 
-## 1. 环境搭建
-
-我们提供了 Next.js 的启动模板。
-使用 "create-hono" 命令启动你的项目。
-在本例中选择 `nextjs` 模板。
+Vercel 的入门模板已提供。
+使用“create-hono”命令开始您的项目。
+为此示例选择 `vercel` 模板。
 
 ::: code-group
 
@@ -41,7 +34,7 @@ deno init --npm hono my-app
 
 :::
 
-进入 `my-app` 目录并安装依赖。
+进入 `my-app` 并安装依赖项。
 
 ::: code-group
 
@@ -67,156 +60,49 @@ bun i
 
 :::
 
+下一步我们将在本地使用 Vercel CLI 来处理应用程序。如果您还没有安装，请按照 [Vercel CLI 文档](https://vercel.com/docs/cli) 全局安装它。
+
 ## 2. Hello World
 
-如果你使用 App Router，编辑 `app/api/[[...route]]/route.ts`。更多选项请参考 [支持的 HTTP 方法](https://nextjs.org/docs/app/building-your-application/routing/route-handlers#supported-http-methods) 部分。
+在您项目的 `index.ts` 或 `src/index.ts` 中，将 Hono 应用程序导出为默认导出。
 
 ```ts
 import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
 
-export const runtime = 'edge'
+const app = new Hono()
 
-const app = new Hono().basePath('/api')
+const welcomeStrings = [
+  '你好 Hono！',
+  '要了解有关 Vercel 上 Hono 的更多信息，请访问 https://vercel.com/docs/frameworks/hono',
+]
 
-app.get('/hello', (c) => {
-  return c.json({
-    message: 'Hello Next.js!',
-  })
+app.get('/', (c) => {
+  return c.text(welcomeStrings.join('\n\n'))
 })
 
-export const GET = handle(app)
-export const POST = handle(app)
+export default app
 ```
 
-如果你使用 Pages Router，编辑 `pages/api/[[...route]].ts`。
-
-```ts
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
-import type { PageConfig } from 'next'
-
-export const config: PageConfig = {
-  runtime: 'edge',
-}
-
-const app = new Hono().basePath('/api')
-
-app.get('/hello', (c) => {
-  return c.json({
-    message: 'Hello Next.js!',
-  })
-})
-
-export default handle(app)
-```
+如果您是从 `vercel` 模板开始的，那么这已经为您设置好了。
 
 ## 3. 运行
 
-在本地运行开发服务器。然后在浏览器中访问 `http://localhost:3000`。
+要在本地运行开发服务器：
 
-::: code-group
-
-```sh [npm]
-npm run dev
+```sh
+vercel dev
 ```
 
-```sh [yarn]
-yarn dev
-```
-
-```sh [pnpm]
-pnpm dev
-```
-
-```sh [bun]
-bun run dev
-```
-
-:::
-
-现在，`/api/hello` 只返回 JSON，但如果你构建 React UI，你可以使用 Hono 创建一个全栈应用程序。
+访问 `localhost:3000` 将会得到文本响应。
 
 ## 4. 部署
 
-如果你有 Vercel 账号，你可以通过链接 Git 仓库进行部署。
+使用 `vc deploy` 部署到 Vercel。
 
-## Node.js
-
-你也可以在 Node.js 运行时的 Next.js 上运行 Hono。
-
-### App Router
-
-对于 App Router，你只需要在路由处理程序中将运行时设置为 `nodejs`：
-
-```ts
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
-
-export const runtime = 'nodejs'
-
-const app = new Hono().basePath('/api')
-
-app.get('/hello', (c) => {
-  return c.json({
-    message: 'Hello from Hono!',
-  })
-})
-
-export const GET = handle(app)
-export const POST = handle(app)
+```sh
+vercel deploy
 ```
 
-### Pages Router
+## 延伸阅读
 
-对于 Pages Router，你首先需要安装 Node.js 适配器：
-
-::: code-group
-
-```sh [npm]
-npm i @hono/node-server
-```
-
-```sh [yarn]
-yarn add @hono/node-server
-```
-
-```sh [pnpm]
-pnpm add @hono/node-server
-```
-
-```sh [bun]
-bun add @hono/node-server
-```
-
-:::
-
-然后，你可以使用从 `@hono/node-server/vercel` 导入的 `handle` 函数：
-
-```ts
-import { Hono } from 'hono'
-import { handle } from '@hono/node-server/vercel'
-import type { PageConfig } from 'next'
-
-export const config: PageConfig = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-const app = new Hono().basePath('/api')
-
-app.get('/hello', (c) => {
-  return c.json({
-    message: 'Hello from Hono!',
-  })
-})
-
-export default handle(app)
-```
-
-为了让这在 Pages Router 中正常工作，需要通过在项目仪表板或 `.env` 文件中设置环境变量来禁用 Vercel Node.js 辅助工具：
-
-```text
-NODEJS_HELPERS=0
-```
+[在 Vercel 文档中了解有关 Hono 的更多信息](https://vercel.com/docs/frameworks/backend/hono)。

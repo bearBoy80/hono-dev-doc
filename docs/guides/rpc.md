@@ -1,19 +1,15 @@
----
-title: RPC
-description: Use Hono's RPC feature to share API specifications between the server and the client.
----
 # RPC
 
-The RPC feature allows sharing of the API specifications between the server and the client. 
+The RPC feature allows sharing of the API specifications between the server and the client.
 
 First, export the `typeof` your Hono app (commonly called `AppType`)—or just the routes you want available to the client—from your server code.
 
-By accepting `AppType` as a generic parameter, the Hono Client can infer both the input type(s) specified by the Validator, and the output type(s) emitted by handlers returning `c.json()`. 
+By accepting `AppType` as a generic parameter, the Hono Client can infer both the input type(s) specified by the Validator, and the output type(s) emitted by handlers returning `c.json()`.
 
 > [!NOTE]
 > At this time, responses returned from middleware are [not inferred by the client.](https://github.com/honojs/hono/issues/2719)
 
-> [!NOTE]  
+> [!NOTE]
 > For the RPC types to work properly in a monorepo, in both the Client's and Server's tsconfig.json files, set `"strict": true` in `compilerOptions`. [Read more.](https://github.com/honojs/hono/issues/2270#issuecomment-2143745118)
 
 ## Server
@@ -82,6 +78,26 @@ if (res.ok) {
   const data = await res.json()
   console.log(data.message)
 }
+```
+
+### Cookies
+
+To make the client send cookies with every request, add `{ 'init': { 'credentials": 'include' } }` to the options when you're creating the client.
+
+```ts
+// client.ts
+const client = hc<AppType>('http://localhost:8787/', {
+  init: {
+    credentials: 'include',
+  },
+})
+
+// This request will now include any cookies you might have set
+const res = await client.posts.$get({
+  query: {
+    id: '123',
+  },
+})
 ```
 
 ## Status code
@@ -243,6 +259,40 @@ const res = await client.posts[':id'].$get({
 })
 ```
 
+### Include slashes
+
+`hc` function does not URL-encode the values of `param`. To include slashes in parameters, use [regular expressions](/docs/api/routing#regexp).
+
+```ts
+// client.ts
+
+// Requests /posts/123/456
+const res = await client.posts[':id'].$get({
+  param: {
+    id: '123/456',
+  },
+})
+
+// server.ts
+const route = app.get(
+  '/posts/:id{.+}',
+  zValidator(
+    'param',
+    z.object({
+      id: z.string(),
+    })
+  ),
+  (c) => {
+    // id: 123/456
+    const { id } = c.req.valid('param')
+    // ...
+  }
+)
+```
+
+> [!NOTE]
+> Basic path parameters without regular expressions do not match slashes. If you pass a `param` containing slashes using the hc function, the server might not route as intended. Encoding the parameters using `encodeURIComponent` is the recommended approach to ensure correct routing.
+
 ## Headers
 
 You can append the headers to the request.
@@ -351,23 +401,25 @@ You can upload files using a form body:
 // client
 const res = await client.user.picture.$put({
   form: {
-    file: new File([fileToUpload], filename, { type: fileToUpload.type })
+    file: new File([fileToUpload], filename, {
+      type: fileToUpload.type,
+    }),
   },
-});
+})
 ```
 
 ```ts
 // server
 const route = app.put(
-  "/user/picture",
+  '/user/picture',
   zValidator(
-    "form",
+    'form',
     z.object({
       file: z.instanceof(File),
-    }),
-  ),
+    })
+  )
   // ...
-);
+)
 ```
 
 ## Custom `fetch` method
@@ -385,7 +437,7 @@ services = [
 
 ```ts
 // src/client.ts
-const client = hc<CreateProfileType>('/', {
+const client = hc<CreateProfileType>('http://localhost', {
   fetch: c.env.AUTH.fetch.bind(c.env.AUTH),
 })
 ```
@@ -403,6 +455,22 @@ type ReqType = InferRequestType<typeof $post>['form']
 
 // InferResponseType
 type ResType = InferResponseType<typeof $post>
+```
+
+## Parsing a Response with type-safety helper
+
+You can use `parseResponse()` helper to easily parse a Response from `hc` with type-safety.
+
+```ts
+import { parseResponse, DetailedError } from 'hono/client'
+
+// result contains the parsed response body (automatically parsed based on Content-Type)
+const result = await parseResponse(client.hello.$get()).catch(
+  (e: DetailedError) => {
+    console.error(e)
+  }
+)
+// parseResponse automatically throws an error if response is not ok
 ```
 
 ## Using SWR
@@ -525,7 +593,7 @@ However, we have some tips to mitigate this issue.
 
 If your backend is separate from the frontend and lives in a different directory, you need to ensure that the Hono versions match. If you use one Hono version on the backend and another on the frontend, you'll run into issues such as "_Type instantiation is excessively deep and possibly infinite_".
 
-![hono-version-mismatch](https://github.com/user-attachments/assets/e4393c80-29dd-408d-93ab-d55c11ccca05)
+![](https://github.com/user-attachments/assets/e4393c80-29dd-408d-93ab-d55c11ccca05)
 
 #### TypeScript project references
 
@@ -542,8 +610,7 @@ import { app } from './app'
 import { hc } from 'hono/client'
 
 // this is a trick to calculate the type when compiling
-const client = hc<typeof app>('')
-export type Client = typeof client
+export type Client = ReturnType<typeof hc<typeof app>>
 
 export const hcWithType = (...args: Parameters<typeof hc>): Client =>
   hc<typeof app>(...args)

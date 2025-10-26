@@ -1,7 +1,3 @@
----
-title: Stacks
-description: Hono provides a complete stack for RPC, validators, and type-safe HTTP client.
----
 # Hono Stacks
 
 Hono makes easy things easy and hard things easy.
@@ -43,7 +39,7 @@ app.get('/hello', (c) => {
 
 Validate with Zod to receive the value of the query parameter.
 
-![SC](/images/sc01.gif)
+![](/images/sc01.gif)
 
 ```ts
 import { zValidator } from '@hono/zod-validator'
@@ -102,7 +98,7 @@ Next. The client-side implementation.
 Create a client object by passing the `AppType` type to `hc` as generics.
 Then, magically, completion works and the endpoint path and request type are suggested.
 
-![SC](/images/sc03.gif)
+![](/images/sc03.gif)
 
 ```ts
 import { AppType } from './server'
@@ -118,7 +114,7 @@ const res = await client.hello.$get({
 
 The `Response` is compatible with the fetch API, but the data that can be retrieved with `json()` has a type.
 
-![SC](/images/sc04.gif)
+![](/images/sc04.gif)
 
 ```ts
 const data = await res.json()
@@ -127,7 +123,7 @@ console.log(`${data.message}`)
 
 Sharing API specifications means that you can be aware of server-side changes.
 
-![SS](/images/ss03.png)
+![](/images/ss03.png)
 
 ## With React
 

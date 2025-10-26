@@ -1,8 +1,3 @@
----
-title: Proxy Helper
-description: Proxy Helper provides useful functions when using Hono application as a (reverse) proxy.
----
-
 # Proxy Helper
 
 Proxy Helper provides useful functions when using Hono application as a (reverse) proxy.
@@ -66,6 +61,35 @@ app.all('/proxy/:path', (c) => {
 })
 ```
 
+You can override the default global `fetch` function with the `customFetch` option:
+
+```ts
+app.get('/proxy', (c) => {
+  return proxy('https://example.com/', {
+    customFetch,
+  })
+})
+```
+
+### Connection Header Processing
+
+By default, `proxy()` ignores the `Connection` header to prevent Hop-by-Hop Header Injection attacks. You can enable strict RFC 9110 compliance with the `strictConnectionProcessing` option:
+
+```ts
+// Default behavior (recommended for untrusted clients)
+app.get('/proxy/:path', (c) => {
+  return proxy(`http://${originServer}/${c.req.param('path')}`, c.req)
+})
+
+// Strict RFC 9110 compliance (use only in trusted environments)
+app.get('/internal-proxy/:path', (c) => {
+  return proxy(`http://${internalServer}/${c.req.param('path')}`, {
+    ...c.req,
+    strictConnectionProcessing: true,
+  })
+})
+```
+
 ### `ProxyFetch`
 
 The type of `proxy()` is defined as `ProxyFetch` and is as follows
@@ -73,6 +97,8 @@ The type of `proxy()` is defined as `ProxyFetch` and is as follows
 ```ts
 interface ProxyRequestInit extends Omit<RequestInit, 'headers'> {
   raw?: Request
+  customFetch?: (request: Request) => Promise<Response>
+  strictConnectionProcessing?: boolean
   headers?:
     | HeadersInit
     | [string, string][]

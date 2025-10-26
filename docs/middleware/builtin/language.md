@@ -1,7 +1,3 @@
----
-title: Language Middleware
-description: "The Language Detector middleware automatically determines a user's preferred language (locale) from various sources and makes it available via `c.get('language')`."    
----
 # Language Middleware
 
 The Language Detector middleware automatically determines a user's preferred language (locale) from various sources and makes it available via `c.get('language')`. Detection strategies include query parameters, cookies, headers, and URL path segments. Perfect for internationalization (i18n) and locale-specific content.
@@ -77,7 +73,6 @@ export const DEFAULT_OPTIONS: DetectorOptions = {
 ### Detection Workflow
 
 1. **Order**: Checks sources in this sequence by default:
-
    - Query parameter (?lang=ar)
    - Cookie (language=ar)
    - Accept-Language header

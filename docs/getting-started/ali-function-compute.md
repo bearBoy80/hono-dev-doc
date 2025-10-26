@@ -1,7 +1,3 @@
----
-title: Alibaba Cloud Function Compute
-description: This guide shows how to run Hono on Alibaba Cloud Function Compute using a third-party adapter, including setup and example code.
----
 # Alibaba Cloud Function Compute
 
 [Alibaba Cloud Function Compute](https://www.alibabacloud.com/en/product/function-compute) is a fully managed, event-driven compute service. Function Compute allows you to focus on writing and uploading code without having to manage infrastructure such as servers.

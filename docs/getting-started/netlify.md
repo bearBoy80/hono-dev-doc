@@ -1,7 +1,3 @@
----
-title: Netlify
-description: This guide shows how to run Hono on Netlify, including setup and example code.
----
 # Netlify
 
 Netlify provides static site hosting and serverless backend services. [Edge Functions](https://docs.netlify.com/edge-functions/overview/) enables us to make the web pages dynamic.

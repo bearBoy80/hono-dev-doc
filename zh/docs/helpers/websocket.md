@@ -1,12 +1,7 @@
----
-title: WebSocket 工具类
-description: WebSocket 工具类是一个用于 Hono 应用程序中服务端 WebSocket 的工具。
----
+# WebSocket 辅助函数
 
-# WebSocket 工具类
-
-WebSocket 工具类是一个用于 Hono 应用程序中服务端 WebSocket 的工具。
-目前支持 Cloudflare Workers / Pages、Deno 和 Bun 适配器。
+WebSocket 辅助函数是用于 Hono 应用程序中服务器端 WebSocket 的辅助函数。
+目前提供 Cloudflare Workers / Pages、Deno 和 Bun 适配器。
 
 ## 导入
 
@@ -24,11 +19,7 @@ import { upgradeWebSocket } from 'hono/deno'
 
 ```ts [Bun]
 import { Hono } from 'hono'
-import { createBunWebSocket } from 'hono/bun'
-import type { ServerWebSocket } from 'bun'
-
-const { upgradeWebSocket, websocket } =
-  createBunWebSocket<ServerWebSocket>()
+import { upgradeWebSocket, websocket } from 'hono/bun'
 
 // ...
 
@@ -40,11 +31,11 @@ export default {
 
 :::
 
-如果你使用 Node.js，可以使用 [@hono/node-ws](https://github.com/honojs/middleware/tree/main/packages/node-ws)。
+如果您使用 Node.js，可以使用 [@hono/node-ws](https://github.com/honojs/middleware/tree/main/packages/node-ws)。
 
 ## `upgradeWebSocket()`
 
-`upgradeWebSocket()` 返回一个用于处理 WebSocket 的处理器。
+`upgradeWebSocket()` 返回一个用于处理 WebSocket 的处理程序。
 
 ```ts
 const app = new Hono()
@@ -54,8 +45,8 @@ app.get(
   upgradeWebSocket((c) => {
     return {
       onMessage(event, ws) {
-        console.log(`来自客户端的消息: ${event.data}`)
-        ws.send('来自服务器的问候！')
+        console.log(`来自客户端的消息：${event.data}`)
+        ws.send('来自服务器的你好！')
       },
       onClose: () => {
         console.log('连接已关闭')
@@ -65,24 +56,24 @@ app.get(
 )
 ```
 
-可用的事件：
+可用事件：
 
-- `onOpen` - 目前，Cloudflare Workers 不支持此事件
+- `onOpen` - 目前，Cloudflare Workers 不支持它。
 - `onMessage`
 - `onClose`
 - `onError`
 
 ::: warning
 
-如果你在使用 WebSocket 工具类的路由上同时使用修改头部的中间件（例如应用 CORS），你可能会遇到无法修改不可变头部的错误。这是因为 `upgradeWebSocket()` 在内部也会修改头部。
+如果您在使用了 WebSocket 辅助函数的路由上使用修改标头（例如应用 CORS）的中间件，您可能会遇到一个错误，提示您无法修改不可变的标头。这是因为 `upgradeWebSocket()` 也会在内部更改标头。
 
-因此，请注意在同时使用 WebSocket 工具类和中间件时要格外小心。
+因此，如果您同时使用 WebSocket 辅助函数和中间件，请务必小心。
 
 :::
 
 ## RPC 模式
 
-使用 WebSocket 工具类定义的处理器支持 RPC 模式。
+使用 WebSocket 辅助函数定义的处理程序支持 RPC 模式。
 
 ```ts
 // server.ts
@@ -102,9 +93,9 @@ const socket = client.ws.$ws() // 客户端的 WebSocket 对象
 
 ## 示例
 
-以下是使用 WebSocket 工具类的示例。
+请参阅使用 WebSocket 辅助函数的示例。
 
-### 服务端和客户端
+### 服务器和客户端
 
 ```ts
 // server.ts
@@ -140,7 +131,7 @@ ws.addEventListener('open', () => {
 })
 ```
 
-### 使用 JSX 的 Bun 示例
+### Bun 与 JSX
 
 ```tsx
 import { Hono } from 'hono'

@@ -1,8 +1,3 @@
----
-title: Third-party Middleware
-description: Third-party middleware refers to middleware not bundled within the Hono package. Most of this middleware leverages external libraries.
----
-
 # Third-party Middleware
 
 Third-party middleware refers to middleware not bundled within the Hono package.
@@ -16,6 +11,7 @@ Most of this middleware leverages external libraries.
 - [OIDC Auth](https://github.com/honojs/middleware/tree/main/packages/oidc-auth)
 - [Firebase Auth](https://github.com/honojs/middleware/tree/main/packages/firebase-auth)
 - [Verify RSA JWT (JWKS)](https://github.com/wataruoguchi/verify-rsa-jwt-cloudflare-worker)
+- [Stytch Auth](https://github.com/honojs/middleware/tree/main/packages/stytch-auth)
 
 ### Validators
 
@@ -31,9 +27,10 @@ Most of this middleware leverages external libraries.
 ### OpenAPI
 
 - [Zod OpenAPI](https://github.com/honojs/middleware/tree/main/packages/zod-openapi)
-- [Scalar API Reference](https://github.com/scalar/scalar/tree/main/integrations/hono)
+- [Scalar](https://github.com/scalar/scalar/tree/main/integrations/hono)
 - [Swagger UI](https://github.com/honojs/middleware/tree/main/packages/swagger-ui)
 - [Hono OpenAPI](https://github.com/rhinobase/hono-openapi)
+- [hono-zod-openapi](https://github.com/paolostyle/hono-zod-openapi)
 
 ### Others
 
@@ -44,6 +41,7 @@ Most of this middleware leverages external libraries.
 - [Hono Rate Limiter](https://github.com/rhinobase/hono-rate-limiter)
 - [Node WebSocket Helper](https://github.com/honojs/middleware/tree/main/packages/node-ws)
 - [Prometheus Metrics](https://github.com/honojs/middleware/tree/main/packages/prometheus)
+- [OpenTelemetry](https://github.com/honojs/middleware/tree/main/packages/otel)
 - [Qwik City](https://github.com/honojs/middleware/tree/main/packages/qwik-city)
 - [React Compatibility](https://github.com/honojs/middleware/tree/main/packages/react-compat)
 - [React Renderer](https://github.com/honojs/middleware/tree/main/packages/react-renderer)
@@ -54,3 +52,4 @@ Most of this middleware leverages external libraries.
 - [Hono Simple DI](https://github.com/maou-shonen/hono-simple-DI)
 - [Highlight.io](https://www.highlight.io/docs/getting-started/backend-sdk/js/hono)
 - [Apitally (API monitoring & analytics)](https://docs.apitally.io/frameworks/hono)
+- [Cap Checkpoint](https://capjs.js.org/guide/middleware/hono.html)

@@ -1,40 +1,30 @@
----
-title: 异常处理
-description: 异常处理是 Hono 框架中处理错误和异常的重要机制。
----
-# 异常处理
+# HTTPException
 
-当发生致命错误（如身份验证失败）时，必须抛出 HTTPException。
+当发生致命错误时，Hono（以及许多生态系统中间件）可能会抛出 `HTTPException`。这是一个自定义的 Hono `Error`，它简化了[返回错误响应](#handling-httpexceptions)的过程。
 
-## 抛出 HTTPException
+## 抛出 HTTPExceptions
 
-以下示例展示了如何在中间件中抛出 HTTPException。
+您可以通过指定状态码以及消息或自定义响应来抛出自己的 HTTPExceptions。
+
+### 自定义消息
+
+对于基本的 `text` 响应，只需设置错误 `message`。
 
 ```ts twoslash
-import { Hono } from 'hono'
-const app = new Hono()
-declare const authorized: boolean
-// ---cut---
 import { HTTPException } from 'hono/http-exception'
 
-// ...
-
-app.post('/auth', async (c, next) => {
-  // 身份验证
-  if (authorized === false) {
-    throw new HTTPException(401, { message: '自定义错误信息' })
-  }
-  await next()
-})
+throw new HTTPException(401, { message: '未经授权' })
 ```
 
-你可以指定要返回给用户的响应内容。
+### 自定义响应
+
+对于其他响应类型，或要设置响应标头，请使用 `res` 选项。_请注意，传递给构造函数的状态是用于创建响应的状态。_
 
 ```ts twoslash
 import { HTTPException } from 'hono/http-exception'
 
 const errorResponse = new Response('未经授权', {
-  status: 401,
+  status: 401, // 这将被忽略
   headers: {
     Authenticate: 'error="invalid_token"',
   },
@@ -43,9 +33,30 @@ const errorResponse = new Response('未经授权', {
 throw new HTTPException(401, { res: errorResponse })
 ```
 
-## 处理 HTTPException
+### 原因
 
-你可以通过 `app.onError` 来处理抛出的 HTTPException。
+在任何一种情况下，您都可以使用 [`cause`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause) 选项向 HTTPException 添加任意数据。
+
+```ts twoslash
+import { Hono, Context } from 'hono'
+import { HTTPException } from 'hono/http-exception'
+const app = new Hono()
+declare const message: string
+declare const authorize: (c: Context) => Promise<void>
+// ---cut---
+app.post('/login', async (c) => {
+  try {
+    await authorize(c)
+  } catch (cause) {
+    throw new HTTPException(401, { message, cause })
+  }
+  return c.redirect('/')
+})
+```
+
+## 处理 HTTPExceptions
+
+您可以使用 [`app.onError`](/docs/api/hono#error-handling) 处理未捕获的 HTTPExceptions。它们包含一个 `getResponse` 方法，该方法返回一个从错误 `status` 创建的新 `Response`，以及错误 `message` 或抛出错误时设置的[自定义响应](#custom-response)。
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -55,35 +66,19 @@ import { HTTPException } from 'hono/http-exception'
 
 // ...
 
-app.onError((err, c) => {
-  if (err instanceof HTTPException) {
+app.onError((error, c) => {
+  if (error instanceof HTTPException) {
+    console.error(error.cause)
     // 获取自定义响应
-    return err.getResponse()
+    return error.getResponse()
   }
   // ...
   // ---cut-start---
-  return c.text('Error')
+  return c.text('意外错误')
   // ---cut-end---
 })
 ```
 
-## `cause` 属性
-
-可以使用 `cause` 选项来添加 [`cause`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause) 数据。
-
-```ts twoslash
-import { Hono, Context } from 'hono'
-import { HTTPException } from 'hono/http-exception'
-const app = new Hono()
-declare const message: string
-declare const authorize: (c: Context) => void
-// ---cut---
-app.post('/auth', async (c, next) => {
-  try {
-    authorize(c)
-  } catch (e) {
-    throw new HTTPException(401, { message, cause: e })
-  }
-  await next()
-})
-```
+::: warning
+**`HTTPException.getResponse` 不知道 `Context`**。要包含已在 `Context` 中设置的标头，您必须将它们应用于新的 `Response`。
+:::

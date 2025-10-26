@@ -1,7 +1,3 @@
----
-title: CBOR
-description: Hono's built-in CBOR middleware provides functionality for handling CBOR data.
----
 # CBOR
 
 [CBOR](https://cbor.io/) is a binary format for serializing objects defined in [RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html). It is JSON-compatible and suitable for network communications that require efficient data exchange, as well as for use in resource-constrained environments such as IoT devices.

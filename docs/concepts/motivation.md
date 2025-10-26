@@ -1,8 +1,3 @@
----
-title: Motivation
-description: Motivation of Hono
----
-
 # Philosophy
 
 In this section, we talk about the concept, or philosophy, of Hono.

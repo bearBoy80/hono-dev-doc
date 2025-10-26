@@ -1,11 +1,6 @@
----
-title: ConnInfo
-description: 使用ConnInfo，可以方便地获取连接信息。
----
+# ConnInfo 辅助函数
 
-# ConnInfo
-
-ConnInfo可以帮助你获取连接信息。例如，你可以轻松获取客户端的远程地址。
+ConnInfo 辅助函数可帮助您获取连接信息。例如，您可以轻松获取客户端的远程地址。
 
 ## 导入
 
@@ -43,20 +38,20 @@ import { getConnInfo } from '@hono/node-server/conninfo'
 
 :::
 
-## 使用方法
+## 用法
 
 ```ts
 const app = new Hono()
 
 app.get('/', (c) => {
-  const info = getConnInfo(c) // info 的类型为 `ConnInfo`
-  return c.text(`你的远程地址是 ${info.remote.address}`)
+  const info = getConnInfo(c) // info 是 `ConnInfo`
+  return c.text(`您的远程地址是 ${info.remote.address}`)
 })
 ```
 
 ## 类型定义
 
-通过 `getConnInfo()` 可以获取的值的类型定义如下：
+您可以从 `getConnInfo()` 获取的值的类型定义如下：
 
 ```ts
 type AddressType = 'IPv6' | 'IPv4' | undefined
@@ -76,7 +71,7 @@ type NetAddrInfo = {
 } & (
   | {
       /**
-       * 主机名，如 IP 地址
+       * 主机名，例如 IP 地址
        */
       address: string
 

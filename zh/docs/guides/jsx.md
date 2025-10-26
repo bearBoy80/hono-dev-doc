@@ -1,18 +1,14 @@
----
-title: JSX
-description: 使用 `hono/jsx` 可以方便地编写 JSX 语法的 HTML，适用于客户端和服务器端渲染。
----
 # JSX
 
-使用 `hono/jsx` 可以让你用 JSX 语法编写 HTML。
+您可以使用 `hono/jsx` 通过 JSX 语法编写 HTML。
 
-虽然 `hono/jsx` 在客户端也可以使用，但你可能会更多地在服务器端渲染内容时使用它。以下是一些在服务器端和客户端都通用的 JSX 相关内容。
+虽然 `hono/jsx` 可以在客户端运行，但您最常使用它来在服务器端呈现内容。以下是一些与服务器端和客户端通用的 JSX 相关内容。
 
-## 配置
+## 设置
 
-要使用 JSX，需要修改 `tsconfig.json`：
+要使用 JSX，请修改 `tsconfig.json`：
 
-`tsconfig.json`：
+`tsconfig.json`:
 
 ```json
 {
@@ -23,14 +19,14 @@ description: 使用 `hono/jsx` 可以方便地编写 JSX 语法的 HTML，适用
 }
 ```
 
-或者，你可以使用 pragma 指令：
+或者，使用 pragma 指令：
 
 ```ts
 /** @jsx jsx */
 /** @jsxImportSource hono/jsx */
 ```
 
-对于 Deno，你需要修改 `deno.json` 而不是 `tsconfig.json`：
+对于 Deno，您必须修改 `deno.json` 而不是 `tsconfig.json`：
 
 ```json
 {
@@ -41,13 +37,13 @@ description: 使用 `hono/jsx` 可以方便地编写 JSX 语法的 HTML，适用
 }
 ```
 
-## 使用方法
+## 用法
 
 :::info
-如果你是直接从[快速开始](/docs/#quick-start)过来的，主文件可能是 `.ts` 扩展名 - 你需要将其改为 `.tsx` - 否则应用将无法运行。你还需要相应地修改 `package.json`（如果使用 Deno 则是 `deno.json`）来反映这个改动（例如，将开发脚本中的 `bun run --hot src/index.ts` 改为 `bun run --hot src/index.tsx`）。
+如果您直接从[快速入门](/docs/#quick-start)开始，主文件的扩展名为 `.ts` - 您需要将其更改为 `.tsx` - 否则您将根本无法运行该应用程序。您还应修改 `package.json`（或如果您使用 Deno，则为 `deno.json`）以反映该更改（例如，dev 脚本中不应有 `bun run --hot src/index.ts`，而应有 `bun run --hot src/index.tsx`）。
 :::
 
-`index.tsx`：
+`index.tsx`:
 
 ```tsx
 import { Hono } from 'hono'
@@ -68,7 +64,7 @@ const Top: FC<{ messages: string[] }> = (props: {
 }) => {
   return (
     <Layout>
-      <h1>Hello Hono!</h1>
+      <h1>你好 Hono！</h1>
       <ul>
         {props.messages.map((message) => {
           return <li>{message}!!</li>
@@ -79,8 +75,42 @@ const Top: FC<{ messages: string[] }> = (props: {
 }
 
 app.get('/', (c) => {
-  const messages = ['Good Morning', 'Good Evening', 'Good Night']
+  const messages = ['早上好', '晚上好', '晚安']
   return c.html(<Top messages={messages} />)
+})
+
+export default app
+```
+
+## 元数据提升
+
+您可以直接在组件内部编写文档元数据标签，例如 `<title>`、`<link>` 和 `<meta>`。这些标签将自动提升到文档的 `<head>` 部分。当 `<head>` 元素远离确定适当元数据的组件呈现时，这尤其有用。
+
+```tsx
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+app.use('*', async (c, next) => {
+  c.setRenderer((content) => {
+    return c.html(
+      <html>
+        <head></head>
+        <body>{content}</body>
+      </html>
+    )
+  })
+  await next()
+})
+
+app.get('/about', (c) => {
+  return c.render(
+    <>
+      <title>关于页面</title>
+      <meta name='description' content='这是关于页面。' />
+      关于页面内容
+    </>
+  )
 })
 
 export default app
@@ -88,35 +118,35 @@ export default app
 
 ## Fragment
 
-使用 Fragment 可以在不添加额外节点的情况下组合多个元素：
+使用 Fragment 对多个元素进行分组，而无需添加额外的节点：
 
 ```tsx
 import { Fragment } from 'hono/jsx'
 
 const List = () => (
   <Fragment>
-    <p>first child</p>
-    <p>second child</p>
-    <p>third child</p>
+    <p>第一个子元素</p>
+    <p>第二个子元素</p>
+    <p>第三个子元素</p>
   </Fragment>
 )
 ```
 
-如果配置正确，你也可以使用 `<></>` 简写语法：
+或者，如果设置正确，您可以使用 `<></>` 来编写它。
 
 ```tsx
 const List = () => (
   <>
-    <p>first child</p>
-    <p>second child</p>
-    <p>third child</p>
+    <p>第一个子元素</p>
+    <p>第二个子元素</p>
+    <p>第三个子元素</p>
   </>
 )
 ```
 
 ## `PropsWithChildren`
 
-你可以使用 `PropsWithChildren` 来正确推断函数组件中的子元素类型：
+您可以使用 `PropsWithChildren` 在函数组件中正确推断子元素。
 
 ```tsx
 import { PropsWithChildren } from 'hono/jsx'
@@ -149,25 +179,25 @@ app.get('/foo', (c) => {
 
 ## 记忆化
 
-使用 `memo` 通过记忆化计算字符串来优化你的组件：
+通过使用 `memo` 记忆化计算出的字符串来优化您的组件：
 
 ```tsx
 import { memo } from 'hono/jsx'
 
-const Header = memo(() => <header>Welcome to Hono</header>)
-const Footer = memo(() => <footer>Powered by Hono</footer>)
+const Header = memo(() => <header>欢迎来到 Hono</header>)
+const Footer = memo(() => <footer>由 Hono 提供支持</footer>)
 const Layout = (
   <div>
     <Header />
-    <p>Hono is cool!</p>
+    <p>Hono 很酷！</p>
     <Footer />
   </div>
 )
 ```
 
-## Context
+## 上下文
 
-通过使用 `useContext`，你可以在不通过 props 传递值的情况下，在组件树的任何层级共享数据：
+通过使用 `useContext`，您可以在组件树的任何级别全局共享数据，而无需通过 props 传递值。
 
 ```tsx
 import type { FC } from 'hono/jsx'
@@ -188,7 +218,7 @@ const ThemeContext = createContext(themes.light)
 
 const Button: FC = () => {
   const theme = useContext(ThemeContext)
-  return <button style={theme}>Push!</button>
+  return <button style={theme}>按下！</button>
 }
 
 const Toolbar: FC = () => {
@@ -214,13 +244,13 @@ app.get('/', (c) => {
 
 ## 异步组件
 
-`hono/jsx` 支持异步组件，因此你可以在组件中使用 `async`/`await`。
-如果你使用 `c.html()` 渲染它，它会自动等待完成。
+`hono/jsx` 支持异步组件，因此您可以在组件中使用 `async`/`await`。
+如果使用 `c.html()` 呈现它，它将自动等待。
 
 ```tsx
 const AsyncComponent = async () => {
-  await new Promise((r) => setTimeout(r, 1000)) // 暂停 1 秒
-  return <div>Done!</div>
+  await new Promise((r) => setTimeout(r, 1000)) // 休眠 1 秒
+  return <div>完成！</div>
 }
 
 app.get('/', (c) => {
@@ -234,11 +264,11 @@ app.get('/', (c) => {
 })
 ```
 
-## Suspense <Badge style="vertical-align: middle;" type="warning" text="实验性功能" />
+## Suspense <Badge style="vertical-align: middle;" type="warning" text="实验性" />
 
-React 风格的 `Suspense` 功能已经可用。
-如果你用 `Suspense` 包装异步组件，fallback 中的内容会先渲染，一旦 Promise 解决，就会显示等待的内容。
-你可以配合 `renderToReadableStream()` 使用它。
+类似 React 的 `Suspense` 功能可用。
+如果使用 `Suspense` 包装异步组件，则会首先呈现 fallback 中的内容，一旦 Promise 被解析，就会显示等待的内容。
+您可以将其与 `renderToReadableStream()` 一起使用。
 
 ```tsx
 import { renderToReadableStream, Suspense } from 'hono/jsx/streaming'
@@ -249,7 +279,7 @@ app.get('/', (c) => {
   const stream = renderToReadableStream(
     <html>
       <body>
-        <Suspense fallback={<div>loading...</div>}>
+        <Suspense fallback={<div>加载中...</div>}>
           <Component />
         </Suspense>
       </body>
@@ -264,23 +294,23 @@ app.get('/', (c) => {
 })
 ```
 
-## ErrorBoundary <Badge style="vertical-align: middle;" type="warning" text="实验性功能" />
+## ErrorBoundary <Badge style="vertical-align: middle;" type="warning" text="实验性" />
 
-你可以使用 `ErrorBoundary` 捕获子组件中的错误。
+您可以使用 `ErrorBoundary` 捕获子组件中的错误。
 
-在下面的示例中，如果发生错误，将显示 `fallback` 中指定的内容。
+在下面的示例中，如果发生错误，它将显示 `fallback` 中指定的内容。
 
 ```tsx
 function SyncComponent() {
-  throw new Error('Error')
-  return <div>Hello</div>
+  throw new Error('错误')
+  return <div>你好</div>
 }
 
 app.get('/sync', async (c) => {
   return c.html(
     <html>
       <body>
-        <ErrorBoundary fallback={<div>Out of Service</div>}>
+        <ErrorBoundary fallback={<div>服务不可用</div>}>
           <SyncComponent />
         </ErrorBoundary>
       </body>
@@ -294,16 +324,16 @@ app.get('/sync', async (c) => {
 ```tsx
 async function AsyncComponent() {
   await new Promise((resolve) => setTimeout(resolve, 2000))
-  throw new Error('Error')
-  return <div>Hello</div>
+  throw new Error('错误')
+  return <div>你好</div>
 }
 
 app.get('/with-suspense', async (c) => {
   return c.html(
     <html>
       <body>
-        <ErrorBoundary fallback={<div>Out of Service</div>}>
-          <Suspense fallback={<div>Loading...</div>}>
+        <ErrorBoundary fallback={<div>服务不可用</div>}>
+          <Suspense fallback={<div>加载中...</div>}>
             <AsyncComponent />
           </Suspense>
         </ErrorBoundary>
@@ -313,10 +343,47 @@ app.get('/with-suspense', async (c) => {
 })
 ```
 
+## StreamingContext <Badge style="vertical-align: middle;" type="warning" text="实验性" />
+
+您可以使用 `StreamingContext` 为 `Suspense` 和 `ErrorBoundary` 等流式组件提供配置。这对于将 nonce 值添加到这些组件生成的脚本标签以实现内容安全策略 (CSP) 非常有用。
+
+```tsx
+import { Suspense, StreamingContext } from 'hono/jsx/streaming'
+
+// ...
+
+app.get('/', (c) => {
+  const stream = renderToReadableStream(
+    <html>
+      <body>
+        <StreamingContext
+          value={{ scriptNonce: 'random-nonce-value' }}
+        >
+          <Suspense fallback={<div>加载中...</div>}>
+            <AsyncComponent />
+          </Suspense>
+        </StreamingContext>
+      </body>
+    </html>
+  )
+
+  return c.body(stream, {
+    headers: {
+      'Content-Type': 'text/html; charset=UTF-8',
+      'Transfer-Encoding': 'chunked',
+      'Content-Security-Policy':
+        "script-src 'nonce-random-nonce-value'",
+    },
+  })
+})
+```
+
+`scriptNonce` 值将自动添加到由 `Suspense` 和 `ErrorBoundary` 组件生成的任何 `<script>` 标签中。
+
 ## 与 html 中间件集成
 
-结合 JSX 和 html 中间件可以实现强大的模板功能。
-详细信息请参考 [html 中间件文档](/docs/helpers/html)。
+结合 JSX 和 html 中间件以实现强大的模板化。
+有关深入的详细信息，请查阅 [html 中间件文档](/docs/helpers/html)。
 
 ```tsx
 import { Hono } from 'hono'
@@ -342,7 +409,7 @@ const Layout = (props: SiteData) =>
 
 const Content = (props: { siteData: SiteData; name: string }) => (
   <Layout {...props.siteData}>
-    <h1>Hello {props.name}</h1>
+    <h1>你好 {props.name}</h1>
   </Layout>
 )
 
@@ -351,7 +418,7 @@ app.get('/:name', (c) => {
   const props = {
     name: name,
     siteData: {
-      title: 'JSX with html sample',
+      title: '带 html 示例的 JSX',
     },
   }
   return c.html(<Content {...props} />)
@@ -360,13 +427,13 @@ app.get('/:name', (c) => {
 export default app
 ```
 
-## 与 JSX 渲染器中间件配合使用
+## 与 JSX 渲染器中间件一起使用
 
-[JSX 渲染器中间件](/docs/middleware/builtin/jsx-renderer)可以让你更轻松地使用 JSX 创建 HTML 页面。
+[JSX 渲染器中间件](/docs/middleware/builtin/jsx-renderer) 允许您更轻松地使用 JSX 创建 HTML 页面。
 
 ## 覆盖类型定义
 
-你可以覆盖类型定义来添加自定义元素和属性。
+您可以覆盖类型定义以添加您的自定义元素和属性。
 
 ```ts
 declare module 'hono/jsx' {

@@ -1,7 +1,3 @@
----
-title: Testing
-description: Testing Hono applications
----
 # Testing
 
 [Vitest]: https://vitest.dev/

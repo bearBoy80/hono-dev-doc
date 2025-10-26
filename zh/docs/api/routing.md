@@ -1,13 +1,9 @@
----
-title: 路由
-description: Hono的路由系统灵活直观，支持多种路由方式。
----
 # 路由
 
-Hono 的路由系统灵活直观。
-让我们来看看。
+Hono 的路由灵活直观。
+我们来看看。
 
-## 基础用法
+## 基础
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -25,19 +21,19 @@ app.get('/wild/*/card', (c) => {
 })
 
 // 任意 HTTP 方法
-app.all('/hello', (c) => c.text('Any Method /hello'))
+app.all('/hello', (c) => c.text('任意方法 /hello'))
 
 // 自定义 HTTP 方法
-app.on('PURGE', '/cache', (c) => c.text('PURGE Method /cache'))
+app.on('PURGE', '/cache', (c) => c.text('PURGE 方法 /cache'))
 
-// 多个方法
+// 多种方法
 app.on(['PUT', 'DELETE'], '/post', (c) =>
-  c.text('PUT or DELETE /post')
+  c.text('PUT 或 DELETE /post')
 )
 
 // 多个路径
 app.on('GET', ['/hello', '/ja/hello', '/en/hello'], (c) =>
-  c.text('Hello')
+  c.text('你好')
 )
 ```
 
@@ -54,7 +50,7 @@ app.get('/user/:name', async (c) => {
 })
 ```
 
-或者一次获取所有参数：
+或一次性获取所有参数：
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -74,7 +70,7 @@ import { Hono } from 'hono'
 const app = new Hono()
 // ---cut---
 // 将匹配 `/api/animal` 和 `/api/animal/:type`
-app.get('/api/animal/:type?', (c) => c.text('Animal!'))
+app.get('/api/animal/:type?', (c) => c.text('动物！'))
 ```
 
 ## 正则表达式
@@ -90,7 +86,7 @@ app.get('/post/:date{[0-9]+}/:title{[a-z]+}', async (c) => {
 })
 ```
 
-## 包含斜杠的路径
+## 包含斜杠
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -119,22 +115,22 @@ app
   })
 ```
 
-## 路由分组
+## 分组
 
-你可以使用 Hono 实例对路由进行分组，并通过 route 方法将它们添加到主应用中。
+您可以使用 Hono 实例对路由进行分组，并使用路由方法将它们添加到主应用中。
 
 ```ts twoslash
 import { Hono } from 'hono'
 // ---cut---
 const book = new Hono()
 
-book.get('/', (c) => c.text('List Books')) // GET /book
+book.get('/', (c) => c.text('图书列表')) // GET /book
 book.get('/:id', (c) => {
   // GET /book/:id
   const id = c.req.param('id')
-  return c.text('Get Book: ' + id)
+  return c.text('获取图书：' + id)
 })
-book.post('/', (c) => c.text('Create Book')) // POST /book
+book.post('/', (c) => c.text('创建图书')) // POST /book
 
 const app = new Hono()
 app.route('/book', book)
@@ -142,18 +138,18 @@ app.route('/book', book)
 
 ## 不改变基础路径的分组
 
-你也可以在保持基础路径的同时对多个实例进行分组。
+您也可以在保持基础路径的同时对多个实例进行分组。
 
 ```ts twoslash
 import { Hono } from 'hono'
 // ---cut---
 const book = new Hono()
-book.get('/book', (c) => c.text('List Books')) // GET /book
-book.post('/book', (c) => c.text('Create Book')) // POST /book
+book.get('/book', (c) => c.text('图书列表')) // GET /book
+book.post('/book', (c) => c.text('创建图书')) // POST /book
 
 const user = new Hono().basePath('/user')
-user.get('/', (c) => c.text('List Users')) // GET /user
-user.post('/', (c) => c.text('Create User')) // POST /user
+user.get('/', (c) => c.text('用户列表')) // GET /user
+user.post('/', (c) => c.text('创建用户')) // POST /user
 
 const app = new Hono()
 app.route('/', book) // 处理 /book
@@ -162,18 +158,18 @@ app.route('/', user) // 处理 /user
 
 ## 基础路径
 
-你可以指定基础路径。
+您可以指定基础路径。
 
 ```ts twoslash
 import { Hono } from 'hono'
 // ---cut---
 const api = new Hono().basePath('/api')
-api.get('/book', (c) => c.text('List Books')) // GET /api/book
+api.get('/book', (c) => c.text('图书列表')) // GET /api/book
 ```
 
 ## 带主机名的路由
 
-如果包含主机名，路由也能正常工作。
+如果包含主机名，它也能正常工作。
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -182,13 +178,13 @@ const app = new Hono({
   getPath: (req) => req.url.replace(/^https?:\/([^?]+).*$/, '$1'),
 })
 
-app.get('/www1.example.com/hello', (c) => c.text('hello www1'))
-app.get('/www2.example.com/hello', (c) => c.text('hello www2'))
+app.get('/www1.example.com/hello', (c) => c.text('你好 www1'))
+app.get('/www2.example.com/hello', (c) => c.text('你好 www2'))
 ```
 
-## 基于 `host` 头的路由
+## 带 `host` 标头值的路由
 
-如果在 Hono 构造函数中设置了 `getPath()` 函数，Hono 可以处理 `host` 头的值。
+如果您在 Hono 构造函数中设置了 `getPath()` 函数，Hono 可以处理 `host` 标头值。
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -200,7 +196,7 @@ const app = new Hono({
     req.url.replace(/^https?:\/\/[^/]+(\/[^?]*).*/, '$1'),
 })
 
-app.get('/www1.example.com/hello', (c) => c.text('hello www1'))
+app.get('/www1.example.com/hello', (c) => c.text('你好 www1'))
 
 // 以下请求将匹配该路由：
 // new Request('http://www1.example.com/hello', {
@@ -208,7 +204,7 @@ app.get('/www1.example.com/hello', (c) => c.text('hello www1'))
 // })
 ```
 
-通过这种方式，例如，你可以根据 `User-Agent` 头来改变路由。
+通过应用此方法，例如，您可以根据 `User-Agent` 标头更改路由。
 
 ## 路由优先级
 
@@ -219,29 +215,29 @@ import { Hono } from 'hono'
 const app = new Hono()
 // ---cut---
 app.get('/book/a', (c) => c.text('a')) // a
-app.get('/book/:slug', (c) => c.text('common')) // common
+app.get('/book/:slug', (c) => c.text('通用')) // 通用
 ```
 
 ```
 GET /book/a ---> `a`
-GET /book/b ---> `common`
+GET /book/b ---> `通用`
 ```
 
-当处理程序执行时，进程将停止。
+当执行处理程序时，该过程将停止。
 
 ```ts twoslash
 import { Hono } from 'hono'
 const app = new Hono()
 // ---cut---
-app.get('*', (c) => c.text('common')) // common
+app.get('*', (c) => c.text('通用')) // 通用
 app.get('/foo', (c) => c.text('foo')) // foo
 ```
 
 ```
-GET /foo ---> `common` // foo 将不会被调用
+GET /foo ---> `通用` // foo 将不会被分发
 ```
 
-如果你有想要执行的中间件，请将代码写在处理程序之上。
+如果您有要执行的中间件，请将代码写在处理程序之上。
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -252,25 +248,25 @@ app.use(logger())
 app.get('/foo', (c) => c.text('foo'))
 ```
 
-如果你想要一个"_后备_"处理程序，请将代码写在其他处理程序之下。
+如果您想有一个“_回退_”处理程序，请将代码写在其他处理程序之下。
 
 ```ts twoslash
 import { Hono } from 'hono'
 const app = new Hono()
 // ---cut---
 app.get('/bar', (c) => c.text('bar')) // bar
-app.get('*', (c) => c.text('fallback')) // fallback
+app.get('*', (c) => c.text('回退')) // 回退
 ```
 
 ```
 GET /bar ---> `bar`
-GET /foo ---> `fallback`
+GET /foo ---> `回退`
 ```
 
 ## 分组顺序
 
-注意，路由分组的错误很难发现。
-`route()` 函数从第二个参数（如 `three` 或 `two`）获取存储的路由，并将其添加到自己（`two` 或 `app`）的路由中。
+请注意，分组路由的错误很难被发现。
+`route()` 函数从第二个参数（例如 `three` 或 `two`）中获取存储的路由，并将其添加到自己的（`two` 或 `app`）路由中。
 
 ```ts
 three.get('/hi', (c) => c.text('hi'))
@@ -280,13 +276,13 @@ app.route('/two', two)
 export default app
 ```
 
-这将返回 200 响应。
+它将返回 200 响应。
 
 ```
 GET /two/three/hi ---> `hi`
 ```
 
-但是，如果顺序错误，它将返回 404。
+但是，如果它们的顺序错误，它将返回 404。
 
 ```ts twoslash
 import { Hono } from 'hono'
@@ -302,5 +298,5 @@ export default app
 ```
 
 ```
-GET /two/three/hi ---> 404 Not Found
+GET /two/three/hi ---> 404 未找到
 ```

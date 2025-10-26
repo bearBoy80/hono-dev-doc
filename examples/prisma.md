@@ -1,7 +1,3 @@
----
-title: Using Prisma on Cloudflare Workers
-description: "Using Prisma on Cloudflare Workers has two ways: using Prisma Accelerate or using driver adapters."
----
 # Using Prisma on Cloudflare Workers
 
 [Prisma ORM](https://www.prisma.io/docs?utm_source=hono&utm_medium=website&utm_campaign=workers) provides a modern, robust toolkit for interacting with databases. When paired with Hono and Cloudflare Workers, it enables you to deploy high-performance, serverless applications at the edge.

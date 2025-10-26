@@ -1,7 +1,3 @@
----
-title: Client Components
-description: hono/jsx not only supports server side but also client side. This means that it is possible to create an interactive UI that runs in the browser. We call it Client Components or hono/jsx/dom.
----
 # Client Components
 
 `hono/jsx` supports not only server side but also client side. This means that it is possible to create an interactive UI that runs in the browser. We call it Client Components or `hono/jsx/dom`.

@@ -1,8 +1,3 @@
----
-title: API
-description: API of Hono
----
-
 # API
 
 Hono's API is simple.

@@ -1,8 +1,3 @@
----
-title: ETag Middleware
-description: Using this middleware, you can add ETag headers easily.
----
-
 # ETag Middleware
 
 Using this middleware, you can add ETag headers easily.

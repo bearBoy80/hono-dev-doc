@@ -1,7 +1,3 @@
----
-title: Middleware
-description: Middleware in Hono
----
 # Middleware
 
 Middleware works after/before Handler. We can get `Request` before dispatching or manipulate `Response` after dispatching.
@@ -77,6 +73,8 @@ middleware 1 start
   middleware 2 end
 middleware 1 end
 ```
+
+Note that if the handler or any middleware throws, hono will catch it and either pass it to [your app.onError() callback](/docs/api/hono#error-handling) or automatically convert it to a 500 response before returning it up the chain of middleware. This means that next() will never throw, so there is no need to wrap it in a try/catch/finally.
 
 ## Built-in Middleware
 

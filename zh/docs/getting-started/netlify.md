@@ -1,18 +1,14 @@
----
-title: Netlify
-description: 使用 Hono 在 Netlify 边缘计算平台上进行开发和部署，利用 Netlify CLI 实现无服务器功能。
----
 # Netlify
 
-Netlify 提供静态网站托管和无服务器后端服务。[Edge Functions](https://docs.netlify.com/edge-functions/overview/)（边缘函数）使我们能够让网页变得动态。
+Netlify 提供静态站点托管和无服务器后端服务。[边缘函数](https://docs.netlify.com/edge-functions/overview/) 使我们能够使网页动态化。
 
-Edge Functions 支持使用 Deno 和 TypeScript 进行开发，并通过 [Netlify CLI](https://docs.netlify.com/cli/get-started/) 实现简单的部署。使用 Hono，你可以为 Netlify Edge Functions 创建应用程序。
+边缘函数支持使用 Deno 和 TypeScript 编写，并且通过 [Netlify CLI](https://docs.netlify.com/cli/get-started/) 可以轻松部署。使用 Hono，您可以为 Netlify 边缘函数创建应用程序。
 
-## 1. 环境搭建
+## 1. 设置
 
-我们提供了 Netlify 的启动模板。
-使用 "create-hono" 命令启动你的项目。
-在本例中选择 `netlify` 模板。
+有一个适用于 Netlify 的入门模板。
+使用“create-hono”命令开始您的项目。
+本例选择 `netlify` 模板。
 
 ::: code-group
 
@@ -38,7 +34,7 @@ deno init --npm hono my-app
 
 :::
 
-进入 `my-app` 目录。
+进入 `my-app`。
 
 ## 2. Hello World
 
@@ -51,7 +47,7 @@ import { handle } from 'jsr:@hono/hono/netlify'
 const app = new Hono()
 
 app.get('/', (c) => {
-  return c.text('Hello Hono!')
+  return c.text('你好 Hono！')
 })
 
 export default handle(app)
@@ -59,7 +55,7 @@ export default handle(app)
 
 ## 3. 运行
 
-使用 Netlify CLI 运行开发服务器。然后在浏览器中访问 `http://localhost:8888`。
+使用 Netlify CLI 运行开发服务器。然后，在您的 Web 浏览器中访问 `http://localhost:8888`。
 
 ```sh
 netlify dev
@@ -67,7 +63,7 @@ netlify dev
 
 ## 4. 部署
 
-你可以使用 `netlify deploy` 命令进行部署。
+您可以使用 `netlify deploy` 命令进行部署。
 
 ```sh
 netlify deploy --prod
@@ -75,7 +71,7 @@ netlify deploy --prod
 
 ## `Context`
 
-你可以通过 `c.env` 访问 Netlify 的 `Context`：
+您可以通过 `c.env` 访问 Netlify 的 `Context`：
 
 ```ts
 import { Hono } from 'jsr:@hono/hono'
@@ -94,7 +90,7 @@ const app = new Hono<Env>()
 
 app.get('/country', (c) =>
   c.json({
-    '你在': c.env.context.geo.country?.name,
+    '您在': c.env.context.geo.country?.name,
   })
 )
 

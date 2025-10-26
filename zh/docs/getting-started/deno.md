@@ -1,31 +1,25 @@
----
-title: Deno
-description: 使用 Deno 运行 Hono，包括环境搭建、适配器配置和示例代码。
----
 # Deno
 
-[Deno](https://deno.com/) 是一个基于 V8 引擎的 JavaScript 运行时环境，它与 Node.js 不同。
-Hono 同样可以在 Deno 环境中运行。
+[Deno](https://deno.com/) 是一个基于 V8 构建的 JavaScript 运行时。它不是 Node.js。
+Hono 也可以在 Deno 上运行。
 
-您可以使用 Hono，用 TypeScript 编写代码，通过 `deno` 命令运行应用程序，并将其部署到 "Deno Deploy" 平台。
+您可以使用 Hono，用 TypeScript 编写代码，使用 `deno` 命令运行应用程序，并将其部署到“Deno Deploy”。
 
 ## 1. 安装 Deno
 
-首先，安装 `deno` 命令行工具。
-请参考[官方文档](https://docs.deno.com/runtime/manual/getting_started/installation)。
+首先，安装 `deno` 命令。
+请参阅[官方文档](https://docs.deno.com/runtime/getting_started/installation/)。
 
-## 2. 项目设置
+## 2. 设置
 
-我们提供了一个 Deno 项目模板。
-您可以使用 "create-hono" 命令来启动项目。
+有一个适用于 Deno 的入门模板。
+使用 [`deno init`](https://docs.deno.com/runtime/reference/cli/init/) 命令开始您的项目。
 
 ```sh
-deno init --npm hono my-app
+deno init --npm hono my-app --template=deno
 ```
 
-在本示例中，请选择 `deno` 模板。
-
-进入 `my-app` 目录。对于 Deno 项目，您无需显式安装 Hono。
+进入 `my-app`。对于 Deno，您不必显式安装 Hono。
 
 ```sh
 cd my-app
@@ -33,27 +27,27 @@ cd my-app
 
 ## 3. Hello World
 
-编写您的第一个应用程序。
+编辑 `main.ts`：
 
-```ts
+```ts [main.ts]
 import { Hono } from 'hono'
 
 const app = new Hono()
 
-app.get('/', (c) => c.text('Hello Deno!'))
+app.get('/', (c) => c.text('你好 Deno！'))
 
 Deno.serve(app.fetch)
 ```
 
 ## 4. 运行
 
-只需执行以下命令：
+在本地运行开发服务器。然后，在您的 Web 浏览器中访问 `http://localhost:8000`。
 
 ```sh
 deno task start
 ```
 
-## 修改端口号
+## 更改端口号
 
 您可以通过更新 `main.ts` 中 `Deno.serve` 的参数来指定端口号：
 
@@ -62,9 +56,9 @@ Deno.serve(app.fetch) // [!code --]
 Deno.serve({ port: 8787 }, app.fetch) // [!code ++]
 ```
 
-## 提供静态文件服务
+## 提供静态文件
 
-要提供静态文件服务，请使用从 `hono/middleware.ts` 导入的 `serveStatic`。
+要提供静态文件，请使用从 `hono/deno` 导入的 `serveStatic`。
 
 ```ts
 import { Hono } from 'hono'
@@ -74,13 +68,13 @@ const app = new Hono()
 
 app.use('/static/*', serveStatic({ root: './' }))
 app.use('/favicon.ico', serveStatic({ path: './favicon.ico' }))
-app.get('/', (c) => c.text('You can access: /static/hello.txt'))
+app.get('/', (c) => c.text('您可以访问：/static/hello.txt'))
 app.get('*', serveStatic({ path: './static/fallback.txt' }))
 
 Deno.serve(app.fetch)
 ```
 
-对于上述代码，以下目录结构将正常工作：
+对于上面的代码，它将与以下目录结构很好地配合使用。
 
 ```
 ./
@@ -112,7 +106,7 @@ app.get(
 
 ### `mimes`
 
-您可以通过 `mimes` 添加 MIME 类型：
+您可以使用 `mimes` 添加 MIME 类型：
 
 ```ts
 app.get(
@@ -128,7 +122,7 @@ app.get(
 
 ### `onFound`
 
-您可以通过 `onFound` 指定在找到请求文件时的处理方式：
+您可以使用 `onFound` 指定找到请求文件时的处理方式：
 
 ```ts
 app.get(
@@ -144,14 +138,14 @@ app.get(
 
 ### `onNotFound`
 
-您可以通过 `onNotFound` 指定在未找到请求文件时的处理方式：
+您可以使用 `onNotFound` 指定未找到请求文件时的处理方式：
 
 ```ts
 app.get(
   '/static/*',
   serveStatic({
     onNotFound: (path, c) => {
-      console.log(`${path} 未找到，您访问的是 ${c.req.path}`)
+      console.log(`${path} 未找到，您访问了 ${c.req.path}`)
     },
   })
 )
@@ -159,7 +153,7 @@ app.get(
 
 ### `precompressed`
 
-`precompressed` 选项会检查是否存在 `.br` 或 `.gz` 等扩展名的文件，并根据 `Accept-Encoding` 头部提供服务。它优先使用 Brotli，然后是 Zstd，最后是 Gzip。如果都不可用，则提供原始文件。
+`precompressed` 选项会检查是否存在带有 `.br` 或 `.gz` 等扩展名的文件，并根据 `Accept-Encoding` 标头提供它们。它优先使用 Brotli，然后是 Zstd，最后是 Gzip。如果都不存在，则提供原始文件。
 
 ```ts
 app.get(
@@ -172,27 +166,27 @@ app.get(
 
 ## Deno Deploy
 
-Deno Deploy 是一个面向 Deno 的边缘运行时平台。
-我们可以通过 Deno Deploy 将应用程序发布到全球。
+Deno Deploy 是一个无服务器平台，用于在云中运行 JavaScript 和 TypeScript 应用程序。
+它提供了一个管理平面，用于通过 GitHub 部署等集成来部署和运行应用程序。
 
-Hono 也支持 Deno Deploy。请参考[官方文档](https://docs.deno.com/deploy/manual/)。
+Hono 也可以在 Deno Deploy 上运行。请参阅[官方文档](https://docs.deno.com/deploy/manual/)。
 
 ## 测试
 
-在 Deno 上测试应用程序非常简单。
-您可以使用 `Deno.test` 编写测试，并使用来自 [@std/assert](https://jsr.io/@std/assert) 的 `assert` 或 `assertEquals`。
+在 Deno 上测试应用程序很容易。
+您可以使用 `Deno.test` 编写测试，并使用 [@std/assert](https://jsr.io/@std/assert) 中的 `assert` 或 `assertEquals`。
 
 ```sh
 deno add jsr:@std/assert
 ```
 
-```ts
+```ts [hello.ts]
 import { Hono } from 'hono'
 import { assertEquals } from '@std/assert'
 
 Deno.test('Hello World', async () => {
   const app = new Hono()
-  app.get('/', (c) => c.text('Please test me'))
+  app.get('/', (c) => c.text('请测试我'))
 
   const res = await app.request('http://localhost/')
   assertEquals(res.status, 200)
@@ -205,9 +199,9 @@ Deno.test('Hello World', async () => {
 deno test hello.ts
 ```
 
-## `npm:` 说明符
+## npm 和 JSR
 
-`npm:hono` 也是可用的。您可以通过修改 `deno.json` 来使用它：
+Hono 在 [npm](https://www.npmjs.com/package/hono) 和 [JSR](https://jsr.io/@hono/hono)（JavaScript 注册表）上都可用。您可以在 `deno.json` 中使用 `npm:hono` 或 `jsr:@hono/hono`：
 
 ```json
 {
@@ -218,9 +212,7 @@ deno test hello.ts
 }
 ```
 
-您可以使用 `npm:hono` 或 `jsr:@hono/hono`。
-
-如果您想使用第三方中间件（如 `npm:@hono/zod-validator`）并获得 TypeScript 类型推断，您需要使用 `npm:` 说明符。
+使用第三方中间件时，您可能需要使用与中间件来自同一注册表的 Hono，以进行正确的 TypeScript 类型推断。例如，如果使用 npm 上的中间件，则还应使用 npm 上的 Hono：
 
 ```json
 {
@@ -228,6 +220,18 @@ deno test hello.ts
     "hono": "npm:hono",
     "zod": "npm:zod",
     "@hono/zod-validator": "npm:@hono/zod-validator"
+  }
+}
+```
+
+我们还在 [JSR](https://jsr.io/@hono) 上提供了许多第三方中间件包。在 JSR 上使用中间件时，请使用 JSR 上的 Hono：
+
+```json
+{
+  "imports": {
+    "hono": "jsr:@hono/hono",
+    "zod": "npm:zod",
+    "@hono/zod-validator": "jsr:@hono/zod-validator"
   }
 }
 ```

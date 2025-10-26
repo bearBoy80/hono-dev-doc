@@ -1,7 +1,3 @@
----
-title: Routing
-description: Routing in Hono
----
 # Routing
 
 Routing of Hono is flexible and intuitive.
