@@ -1,5 +1,5 @@
 const SUPPORTED_LANGS = ['zh']
-const BASE_URL = 'https://honodev.pages.dev'
+const BASE_URL = 'https://hono.ubitools.com'
 
 export default {
   transformPageData(pageData) {

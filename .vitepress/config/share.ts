@@ -9,7 +9,7 @@ import transformPageData from './transformPageData'
 
 export default defineConfig({
   sitemap: {
-    hostname: 'https://honodev.pages.dev/'
+    hostname: 'https://hono.ubitools.com/'
   },
   lang: 'en-US',
   title: 'Hono',
